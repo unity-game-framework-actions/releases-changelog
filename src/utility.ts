@@ -6,6 +6,13 @@ import * as eol from 'eol'
 import indentString from 'indent-string'
 import objectPath from 'object-path'
 
+export async function readConfig(): Promise<any> {
+  const path = core.getInput('config', {required: true})
+  const type = core.getInput('configType', {required: true})
+
+  return await readData(path, type)
+}
+
 export async function readData(path: string, type: string): Promise<any> {
   const value = await read(path)
   const data = parse(value, type)
@@ -55,6 +62,24 @@ export function parse(value: string, type: string): any {
   }
 }
 
+export function setOutput(value: string) {
+  const type = core.getInput('outputType', {required: true})
+
+  setOutputByType(type, value)
+}
+
+export function setOutputByType(type: string, value: string) {
+  if (type === 'action' || type === 'all') {
+    core.setOutput('result', value)
+  } else if (type === 'file' || type === 'all') {
+    const path = core.getInput('outputPath', {required: true})
+
+    write(path, value)
+  } else {
+    throw `Invalid output type: '${type}'.`
+  }
+}
+
 export function normalize(value: string): string {
   return eol.crlf(value)
 }
@@ -86,6 +111,12 @@ export function getValue(target: any, path: string): any {
 
 export function setValue(target: any, path: string, value: any) {
   objectPath.set(target, path, value)
+}
+
+export function getRepository(): {owner: string; repo: string} {
+  const repository = core.getInput('repository')
+
+  return getOwnerAndRepo(repository)
 }
 
 export function getOwnerAndRepo(repo: string): {owner: string; repo: string} {

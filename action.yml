@@ -5,6 +5,29 @@ inputs:
     description: 'GitHub token used by action.'
     default: ${{ github.token }}
     required: true
+  repository:
+    description: 'Owner and repository name. For example, "Codertocat/Hello-World".'
+    default: ${{ github.repository }}
+    required: true
+  config:
+    description: 'Path to config with generate settings.'
+    default: .github/milestone-changelog.yml
+    required: true
+  configType:
+    description: 'Type of config representation, possible values "yaml" or "json".'
+    default: yaml
+    required: true
+  outputType:
+    description: 'Type of result output, possible values "action", "file" or "all".'
+    default: action
+    required: true
+  outputPath:
+    description: 'Path of output file.'
+    default: ${{ github.action }}
+    required: true
+outputs:
+  result:
+    description: 'Changelog generation result.'
 runs:
   using: 'node12'
   main: 'dist/index.js'
