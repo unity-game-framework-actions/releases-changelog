@@ -1,5 +1,5 @@
-name: 'Draft'
-description: 'No description.'
+name: 'Releases Changelog'
+description: 'Creates changelog based on all releases.'
 inputs:
   token:
     description: 'GitHub token used by action.'

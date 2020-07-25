@@ -1,3 +1,3 @@
-# draft
+# Releases Changelog
 
-No description.
+Creates changelog based on all releases.

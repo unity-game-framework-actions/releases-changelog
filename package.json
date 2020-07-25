@@ -1,7 +1,7 @@
 {
-  "name": "draft",
-  "version": "0.0.0",
-  "description": "No description.",
+  "name": "releases-changelog",
+  "version": "0.1.0",
+  "description": "Creates changelog based on all releases.",
   "main": "lib/main.js",
   "scripts": {
     "build": "npm run format && npm run tsc && npm run pack",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/unity-game-framework-actions/draft.git"
+    "url": "git+https://github.com/unity-game-framework-actions/releases-changelog.git"
   },
   "author": "Unity Game Framework",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/unity-game-framework-actions/draft/issues"
+    "url": "https://github.com/unity-game-framework-actions/releases-changelog/issues"
   },
-  "homepage": "https://github.com/unity-game-framework-actions/draft#readme",
+  "homepage": "https://github.com/unity-game-framework-actions/releases-changelog#readme",
   "dependencies": {
     "@actions/core": "^1.2.4",
     "@actions/github": "^4.0.0",
