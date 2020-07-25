@@ -1,0 +1,10 @@
+name: 'Draft'
+description: 'No description.'
+inputs:
+  token:
+    description: 'GitHub token used by action.'
+    default: ${{ github.token }}
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
