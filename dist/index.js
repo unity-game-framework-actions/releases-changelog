@@ -10013,11 +10013,16 @@ function getOwnerAndRepo(repo) {
 }
 exports.getOwnerAndRepo = getOwnerAndRepo;
 function formatDate(date, config) {
-    const format = new Intl.DateTimeFormat(config.locale, config.format);
-    const parts = format.formatToParts(date);
     const result = {};
-    for (const part of parts) {
-        result[part.type] = part.value;
+    const keys = Object.keys(config);
+    for (const key of keys) {
+        if (key !== 'locale') {
+            const options = {
+                [key]: config[key]
+            };
+            const format = new Intl.DateTimeFormat(config.locale, options);
+            result[key] = format.format(date);
+        }
     }
     return result;
 }

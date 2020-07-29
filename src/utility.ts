@@ -133,12 +133,19 @@ export function getOwnerAndRepo(repo: string): {owner: string; repo: string} {
 }
 
 export function formatDate(date: Date, config: any): any {
-  const format = new Intl.DateTimeFormat(config.locale, config.format)
-  const parts = format.formatToParts(date)
   const result: any = {}
+  const keys = Object.keys(config)
 
-  for (const part of parts) {
-    result[part.type] = part.value
+  for (const key of keys) {
+    if (key !== 'locale') {
+      const options = {
+        [key]: config[key]
+      }
+
+      const format = new Intl.DateTimeFormat(config.locale, options)
+
+      result[key] = format.format(date)
+    }
   }
 
   return result
