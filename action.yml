@@ -11,7 +11,7 @@ inputs:
     required: true
   config:
     description: 'Path to config with generate settings.'
-    default: .github/milestone-changelog.yml
+    default: .github/releases-changelog.yml
     required: true
   configType:
     description: 'Type of config representation, possible values "yaml" or "json".'

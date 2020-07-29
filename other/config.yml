@@ -1,0 +1,22 @@
+body: |
+  # Changelog
+
+  All notable changes to this project will be documented in this file.
+
+  The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+  and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+  {releasesFormatted}
+  
+release: |
+  ## [{release.tag_name}]({release.html_url}) - {date.day}-{date.month}-{date.year}  
+
+  {release.body}
+  
+empty: |
+  - No release notes.
+dateFormat:
+  locale: en
+  day: 2-digit
+  month: 2-digit
+  year: numeric

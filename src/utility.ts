@@ -132,6 +132,18 @@ export function getOwnerAndRepo(repo: string): {owner: string; repo: string} {
   }
 }
 
+export function formatDate(date: Date, config: any): any {
+  const format = new Intl.DateTimeFormat(config.locale, config.format)
+  const parts = format.formatToParts(date)
+  const result: any = {}
+
+  for (const part of parts) {
+    result[part.type] = part.value
+  }
+
+  return result
+}
+
 export function getOctokit(): any {
   const token = core.getInput('token', {required: true})
 
@@ -212,6 +224,12 @@ export async function getRelease(owner: string, repo: string, idOrTag: string): 
 
     return null
   }
+}
+
+export async function getReleases(owner: string, repo: string): Promise<any[]> {
+  const octokit = getOctokit()
+
+  return await octokit.paginate(`GET /repos/${owner}/${repo}/releases`)
 }
 
 export async function updateRelease(owner: string, repo: string, release: any): Promise<void> {
