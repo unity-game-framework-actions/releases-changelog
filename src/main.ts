@@ -10,7 +10,7 @@ async function run(): Promise<void> {
     const config = await utility.readConfig()
     const result = await action.createChangelog(repository.owner, repository.repo, config)
 
-    utility.setOutput(result)
+    await utility.setOutput(result)
   } catch (error) {
     core.setFailed(error.message)
   }

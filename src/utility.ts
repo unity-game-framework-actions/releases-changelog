@@ -62,19 +62,19 @@ export function parse(value: string, type: string): any {
   }
 }
 
-export function setOutput(value: string) {
+export async function setOutput(value: string) {
   const type = core.getInput('outputType', {required: true})
 
-  setOutputByType(type, value)
+  await setOutputByType(type, value)
 }
 
-export function setOutputByType(type: string, value: string) {
+export async function setOutputByType(type: string, value: string) {
   if (type === 'action' || type === 'all') {
     core.setOutput('result', value)
   } else if (type === 'file' || type === 'all') {
     const path = core.getInput('outputPath', {required: true})
 
-    write(path, value)
+    await write(path, value)
   } else {
     throw `Invalid output type: '${type}'.`
   }

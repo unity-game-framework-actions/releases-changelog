@@ -5061,7 +5061,7 @@ function run() {
             const repository = utility.getRepository();
             const config = yield utility.readConfig();
             const result = yield action.createChangelog(repository.owner, repository.repo, config);
-            utility.setOutput(result);
+            yield utility.setOutput(result);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -9960,21 +9960,25 @@ function parse(value, type) {
 }
 exports.parse = parse;
 function setOutput(value) {
-    const type = core.getInput('outputType', { required: true });
-    setOutputByType(type, value);
+    return __awaiter(this, void 0, void 0, function* () {
+        const type = core.getInput('outputType', { required: true });
+        yield setOutputByType(type, value);
+    });
 }
 exports.setOutput = setOutput;
 function setOutputByType(type, value) {
-    if (type === 'action' || type === 'all') {
-        core.setOutput('result', value);
-    }
-    else if (type === 'file' || type === 'all') {
-        const path = core.getInput('outputPath', { required: true });
-        write(path, value);
-    }
-    else {
-        throw `Invalid output type: '${type}'.`;
-    }
+    return __awaiter(this, void 0, void 0, function* () {
+        if (type === 'action' || type === 'all') {
+            core.setOutput('result', value);
+        }
+        else if (type === 'file' || type === 'all') {
+            const path = core.getInput('outputPath', { required: true });
+            yield write(path, value);
+        }
+        else {
+            throw `Invalid output type: '${type}'.`;
+        }
+    });
 }
 exports.setOutputByType = setOutputByType;
 function normalize(value) {
