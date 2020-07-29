@@ -25,7 +25,7 @@ releaseBody: true
 
 # Used instead of release body format when is empty.
 empty: |
-  - No release notes.
+   - No release notes.
 
 # Settings used to format publish date of issue.
 # (Read about possible options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat.)

@@ -3795,7 +3795,7 @@ function formatReleases(releases, config) {
                 format += `\n${release.body.trim()}\n`;
             }
             else {
-                format += `\n${config.empty}`;
+                format += `\n${config.empty}\n`;
             }
         }
         else {
