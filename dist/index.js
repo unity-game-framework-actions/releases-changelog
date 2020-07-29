@@ -3792,13 +3792,13 @@ function formatReleases(releases, config) {
         format += utility.formatValues(config.release, values);
         if (config.releaseBody) {
             if (release.body !== '') {
-                format += `\n${release.body.trim()}`;
+                format += `${release.body.trim()}`;
             }
             else {
-                format += `\n${config.empty}`;
+                format += `${config.empty}`;
             }
+            format += '\n';
         }
-        format += '\n';
     }
     return format;
 }
