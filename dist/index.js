@@ -3790,6 +3790,14 @@ function formatReleases(releases, config) {
             date: date
         };
         format += utility.formatValues(config.release, values);
+        if (config.releaseBody) {
+            if (release.body !== '') {
+                format += `${release.body.trim()}\n`;
+            }
+            else {
+                format += `${config.empty}\n`;
+            }
+        }
     }
     return format;
 }

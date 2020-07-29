@@ -1,3 +1,7 @@
+# Body format of changelog.
+# Available values:
+#   releases: Array of release objects. (Read about release object: https://docs.github.com/en/rest/reference/repos#list-releases.)
+#   releasesFormatted: Formatted releases as text.
 body: |
   # Changelog
 
@@ -8,13 +12,24 @@ body: |
 
   {releasesFormatted}
   
+# Release format.
+# Available values:
+#   releases: Array of release objects. (Save as 'releases' in body.)
+#   release: Release object. (Read about release object: https://docs.github.com/en/rest/reference/repos#get-a-release.)
+#   date: Date object created based on 'dateFormat' settings.
 release: |
   ## [{release.tag_name}]({release.html_url}) - {date.day}-{date.month}-{date.year}  
-
-  {release.body}
   
+
+# Determines whether to include release body after 'release' format.
+releaseBody: true
+
+# Used instead of release body format when is empty.
 empty: |
   - No release notes.
+
+# Settings used to format publish date of issue.
+# (Read about possible options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat.)
 dateFormat:
   locale: en
   day: 2-digit
