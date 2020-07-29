@@ -3783,7 +3783,7 @@ function formatChangelog(releases, config) {
 function formatReleases(releases, config) {
     let format = '';
     for (const release of releases) {
-        const date = utility.formatDate(release.published_at, config.date);
+        const date = utility.formatDate(release.published_at, config.dateFormat);
         const values = {
             releases: releases,
             release: release,
