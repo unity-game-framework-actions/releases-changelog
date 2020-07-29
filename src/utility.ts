@@ -69,15 +69,30 @@ export async function setOutput(value: string) {
 }
 
 export async function setOutputByType(type: string, value: string) {
-  if (type === 'action' || type === 'all') {
-    core.setOutput('result', value)
-  } else if (type === 'file' || type === 'all') {
-    const path = core.getInput('outputPath', {required: true})
-
-    await write(path, value)
-  } else {
-    throw `Invalid output type: '${type}'.`
+  switch (type) {
+    case 'action':
+      setOutputAction(value)
+      break
+    case 'file':
+      await setOutputFile(value)
+      break
+    case 'all':
+      setOutputAction(value)
+      await setOutputFile(value)
+      break
+    default:
+      throw `Invalid output type: '${type}'.`
   }
+}
+
+export function setOutputAction(value: string) {
+  core.setOutput('result', value)
+}
+
+export async function setOutputFile(value: string) {
+  const path = core.getInput('outputPath', {required: true})
+
+  await write(path, value)
 }
 
 export function normalize(value: string): string {

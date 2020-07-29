@@ -9890,7 +9890,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dispatch = exports.changeRelease = exports.updateRelease = exports.getReleases = exports.getRelease = exports.updateContent = exports.getMilestoneIssues = exports.getMilestone = exports.getOctokit = exports.formatDate = exports.getOwnerAndRepo = exports.getRepository = exports.setValue = exports.getValue = exports.indent = exports.formatValues = exports.normalize = exports.setOutputByType = exports.setOutput = exports.parse = exports.format = exports.write = exports.writeData = exports.read = exports.readData = exports.readConfig = void 0;
+exports.dispatch = exports.changeRelease = exports.updateRelease = exports.getReleases = exports.getRelease = exports.updateContent = exports.getMilestoneIssues = exports.getMilestone = exports.getOctokit = exports.formatDate = exports.getOwnerAndRepo = exports.getRepository = exports.setValue = exports.getValue = exports.indent = exports.formatValues = exports.normalize = exports.setOutputFile = exports.setOutputAction = exports.setOutputByType = exports.setOutput = exports.parse = exports.format = exports.write = exports.writeData = exports.read = exports.readData = exports.readConfig = void 0;
 const core = __importStar(__webpack_require__(840));
 const github = __importStar(__webpack_require__(837));
 const fs_1 = __webpack_require__(747);
@@ -9968,19 +9968,34 @@ function setOutput(value) {
 exports.setOutput = setOutput;
 function setOutputByType(type, value) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (type === 'action' || type === 'all') {
-            core.setOutput('result', value);
-        }
-        else if (type === 'file' || type === 'all') {
-            const path = core.getInput('outputPath', { required: true });
-            yield write(path, value);
-        }
-        else {
-            throw `Invalid output type: '${type}'.`;
+        switch (type) {
+            case 'action':
+                setOutputAction(value);
+                break;
+            case 'file':
+                yield setOutputFile(value);
+                break;
+            case 'all':
+                setOutputAction(value);
+                yield setOutputFile(value);
+                break;
+            default:
+                throw `Invalid output type: '${type}'.`;
         }
     });
 }
 exports.setOutputByType = setOutputByType;
+function setOutputAction(value) {
+    core.setOutput('result', value);
+}
+exports.setOutputAction = setOutputAction;
+function setOutputFile(value) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const path = core.getInput('outputPath', { required: true });
+        yield write(path, value);
+    });
+}
+exports.setOutputFile = setOutputFile;
 function normalize(value) {
     return eol.crlf(value);
 }
