@@ -3799,6 +3799,7 @@ function formatReleases(releases, config) {
             }
             format += '\n';
         }
+        format += '\n';
     }
     return format;
 }

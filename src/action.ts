@@ -46,6 +46,8 @@ function formatReleases(releases: any[], config: any): string {
 
       format += '\n'
     }
+
+    format += '\n'
   }
 
   return format
