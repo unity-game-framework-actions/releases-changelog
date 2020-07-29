@@ -39,15 +39,13 @@ function formatReleases(releases: any[], config: any): string {
 
     if (config.releaseBody) {
       if (release.body !== '') {
-        format += `${release.body.trim()}`
+        format += `\n${release.body.trim()}\n`
       } else {
-        format += `${config.empty}`
+        format += `\n${config.empty}`
       }
-
+    } else {
       format += '\n'
     }
-
-    format += '\n'
   }
 
   return format
