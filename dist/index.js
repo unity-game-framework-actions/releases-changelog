@@ -3792,7 +3792,7 @@ function formatReleases(releases, config) {
         format += utility.formatValues(config.release, values);
         if (config.releaseBody) {
             if (release.body !== '') {
-                format += `\n${release.body.trim()}\n\n`;
+                format += `\n${release.body.trim()}\n\nTEST`;
             }
             else {
                 format += `\n${config.empty}\n`;
