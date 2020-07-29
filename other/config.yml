@@ -19,7 +19,6 @@ body: |
 #   date: Date object created based on 'dateFormat' settings.
 release: |
   ## [{release.tag_name}]({release.html_url}) - {date.day}-{date.month}-{date.year}  
-  
 
 # Determines whether to include release body after 'release' format.
 releaseBody: true
