@@ -6,6 +6,10 @@ import * as eol from 'eol'
 import indentString from 'indent-string'
 import objectPath from 'object-path'
 
+export function merge(target: any, source: any): any {
+  return Object.assign(target, source)
+}
+
 export async function readConfig(): Promise<any> {
   const path = core.getInput('config', {required: true})
   const type = core.getInput('configType', {required: true})
@@ -188,9 +192,7 @@ export async function getMilestone(owner: string, repo: string, milestoneNumberO
       }
     }
 
-    core.info(`Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`)
-
-    return null
+    throw `Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`
   }
 }
 
@@ -242,9 +244,7 @@ export async function getRelease(owner: string, repo: string, idOrTag: string): 
       }
     }
 
-    core.warning(`Release by the specified id or tag name not found: '${idOrTag}'.`)
-
-    return null
+    throw `Release by the specified id or tag name not found: '${idOrTag}'.`
   }
 }
 
@@ -268,34 +268,6 @@ export async function updateRelease(owner: string, repo: string, release: any): 
     draft: release.draft,
     prerelease: release.prerelease
   })
-}
-
-export function changeRelease(release: any, change: any): any {
-  if (change.tag !== '') {
-    release.tag_name = change.tag
-  }
-
-  if (change.commitish !== '') {
-    release.target_commitish = change.commitish
-  }
-
-  if (change.name !== '') {
-    release.name = change.name
-  }
-
-  if (change.body !== '') {
-    release.body = change.body
-  }
-
-  if (change.draft !== '') {
-    release.draft = change.draft === 'true'
-  }
-
-  if (change.prerelease !== '') {
-    release.prerelease = change.prerelease === 'true'
-  }
-
-  return release
 }
 
 export async function dispatch(owner: string, repo: string, eventType: string, payload: any): Promise<void> {
