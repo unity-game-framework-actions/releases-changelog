@@ -9904,7 +9904,7 @@ function merge(target, source) {
 exports.merge = merge;
 function readConfig() {
     return __awaiter(this, void 0, void 0, function* () {
-        const path = core.getInput('config', { required: true });
+        const path = core.getInput('configPath', { required: true });
         const type = core.getInput('configType', { required: true });
         return yield readData(path, type);
     });

@@ -11,7 +11,7 @@ export function merge(target: any, source: any): any {
 }
 
 export async function readConfig(): Promise<any> {
-  const path = core.getInput('config', {required: true})
+  const path = core.getInput('configPath', {required: true})
   const type = core.getInput('configType', {required: true})
 
   return await readData(path, type)
