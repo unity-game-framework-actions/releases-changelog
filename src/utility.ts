@@ -6,6 +6,17 @@ import * as eol from 'eol'
 import indentString from 'indent-string'
 import objectPath from 'object-path'
 
+export function merge(target: any, source: any): any {
+  return Object.assign(target, source)
+}
+
+export async function readConfig(): Promise<any> {
+  const path = core.getInput('configPath', {required: true})
+  const type = core.getInput('configType', {required: true})
+
+  return await readData(path, type)
+}
+
 export async function readData(path: string, type: string): Promise<any> {
   const value = await read(path)
   const data = parse(value, type)
@@ -55,6 +66,39 @@ export function parse(value: string, type: string): any {
   }
 }
 
+export async function setOutput(value: string) {
+  const type = core.getInput('outputType', {required: true})
+
+  await setOutputByType(type, value)
+}
+
+export async function setOutputByType(type: string, value: string) {
+  switch (type) {
+    case 'action':
+      setOutputAction(value)
+      break
+    case 'file':
+      await setOutputFile(value)
+      break
+    case 'all':
+      setOutputAction(value)
+      await setOutputFile(value)
+      break
+    default:
+      throw `Invalid output type: '${type}'.`
+  }
+}
+
+export function setOutputAction(value: string) {
+  core.setOutput('result', value)
+}
+
+export async function setOutputFile(value: string) {
+  const path = core.getInput('outputPath', {required: true})
+
+  await write(path, value)
+}
+
 export function normalize(value: string): string {
   return eol.crlf(value)
 }
@@ -88,6 +132,12 @@ export function setValue(target: any, path: string, value: any) {
   objectPath.set(target, path, value)
 }
 
+export function getRepository(): {owner: string; repo: string} {
+  const repository = core.getInput('repository')
+
+  return getOwnerAndRepo(repository)
+}
+
 export function getOwnerAndRepo(repo: string): {owner: string; repo: string} {
   const split = repo.split('/')
 
@@ -99,6 +149,25 @@ export function getOwnerAndRepo(repo: string): {owner: string; repo: string} {
     owner: split[0],
     repo: split[1]
   }
+}
+
+export function formatDate(date: Date, config: any): any {
+  const result: any = {}
+  const keys = Object.keys(config)
+
+  for (const key of keys) {
+    if (key !== 'locale') {
+      const options = {
+        [key]: config[key]
+      }
+
+      const format = new Intl.DateTimeFormat(config.locale, options)
+
+      result[key] = format.format(date)
+    }
+  }
+
+  return result
 }
 
 export function getOctokit(): any {
@@ -123,9 +192,7 @@ export async function getMilestone(owner: string, repo: string, milestoneNumberO
       }
     }
 
-    core.info(`Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`)
-
-    return null
+    throw `Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`
   }
 }
 
@@ -177,10 +244,14 @@ export async function getRelease(owner: string, repo: string, idOrTag: string): 
       }
     }
 
-    core.warning(`Release by the specified id or tag name not found: '${idOrTag}'.`)
-
-    return null
+    throw `Release by the specified id or tag name not found: '${idOrTag}'.`
   }
+}
+
+export async function getReleases(owner: string, repo: string): Promise<any[]> {
+  const octokit = getOctokit()
+
+  return await octokit.paginate(`GET /repos/${owner}/${repo}/releases`)
 }
 
 export async function updateRelease(owner: string, repo: string, release: any): Promise<void> {
@@ -197,34 +268,6 @@ export async function updateRelease(owner: string, repo: string, release: any): 
     draft: release.draft,
     prerelease: release.prerelease
   })
-}
-
-export function changeRelease(release: any, change: any): any {
-  if (change.tag !== '') {
-    release.tag_name = change.tag
-  }
-
-  if (change.commitish !== '') {
-    release.target_commitish = change.commitish
-  }
-
-  if (change.name !== '') {
-    release.name = change.name
-  }
-
-  if (change.body !== '') {
-    release.body = change.body
-  }
-
-  if (change.draft !== '') {
-    release.draft = change.draft === 'true'
-  }
-
-  if (change.prerelease !== '') {
-    release.prerelease = change.prerelease === 'true'
-  }
-
-  return release
 }
 
 export async function dispatch(owner: string, repo: string, eventType: string, payload: any): Promise<void> {
