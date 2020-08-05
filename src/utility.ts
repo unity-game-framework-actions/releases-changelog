@@ -5,6 +5,7 @@ import * as yaml from 'js-yaml'
 import * as eol from 'eol'
 import indentString from 'indent-string'
 import objectPath from 'object-path'
+import simpleGit from 'simple-git'
 
 export function merge(target: any, source: any): any {
   return Object.assign(target, source)
@@ -279,4 +280,16 @@ export async function dispatch(owner: string, repo: string, eventType: string, p
     event_type: eventType,
     client_payload: JSON.stringify(payload)
   })
+}
+
+export async function getBranchTags(branch: string): Promise<string[]> {
+  const git = simpleGit()
+
+  const result = await git.tag({
+    '--merged': branch
+  })
+
+  const results = result.split('\n')
+
+  return results
 }

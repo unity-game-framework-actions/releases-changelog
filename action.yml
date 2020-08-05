@@ -1,6 +1,10 @@
 name: 'Releases Changelog'
 description: 'Creates changelog based on all releases.'
 inputs:
+  target:
+    description: 'Target used to get list of releases, possible values "all" or "name of branch".'
+    default: all
+    required: true
   token:
     description: 'GitHub token used by action.'
     default: ${{ github.token }}
