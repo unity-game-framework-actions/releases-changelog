@@ -183,6 +183,8 @@ export async function containsInBranch(owner: string, repo: string, branch: stri
   try {
     const response = await octokit.paginate(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`)
 
+    core.debug(JSON.stringify(response, null, 2))
+
     if (response.hasOwnProperty('status')) {
       const status = response.status
 

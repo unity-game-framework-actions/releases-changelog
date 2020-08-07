@@ -15100,6 +15100,7 @@ function containsInBranch(owner, repo, branch, target) {
         const octokit = getOctokit();
         try {
             const response = yield octokit.paginate(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`);
+            core.debug(JSON.stringify(response, null, 2));
             if (response.hasOwnProperty('status')) {
                 const status = response.status;
                 return status === 'behind' || status === 'identical';
