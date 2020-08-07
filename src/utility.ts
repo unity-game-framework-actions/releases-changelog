@@ -189,6 +189,8 @@ export async function containsInBranch(owner: string, repo: string, branch: stri
       core.debug(`compare/${branch}...${target}, status:${status}`)
 
       return status === 'behind' || status === 'identical'
+    } else {
+      core.debug(`compare/${branch}...${target}, status:no, response:${response.status}`)
     }
 
     return false

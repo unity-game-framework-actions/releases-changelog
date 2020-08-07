@@ -10096,6 +10096,9 @@ function containsInBranch(owner, repo, branch, target) {
                 core.debug(`compare/${branch}...${target}, status:${status}`);
                 return status === 'behind' || status === 'identical';
             }
+            else {
+                core.debug(`compare/${branch}...${target}, status:no, response:${response.status}`);
+            }
             return false;
         }
         catch (_a) {
