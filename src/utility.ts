@@ -185,8 +185,11 @@ export async function containsInBranch(owner: string, repo: string, branch: stri
 
     if (response.hasOwnProperty('status')) {
       const status = response.status
+      const result = status === 'behind' || status === 'identical'
 
-      return status === 'behind' || status === 'identical'
+      core.debug(`compare/${branch}...${target}: status:${status}, result:${result}`)
+
+      return result
     }
 
     return false
