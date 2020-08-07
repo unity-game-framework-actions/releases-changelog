@@ -15098,14 +15098,12 @@ exports.getOctokit = getOctokit;
 function containsInBranch(owner, repo, branch, target) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = getOctokit();
-        const response = yield octokit.repos.compareCommits({
-            owner: owner,
-            repo: repo,
-            base: branch,
-            head: target
-        });
-        const status = response.data.status;
-        return status === 'behind' || status === 'identical';
+        const response = yield octokit.paginate(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`);
+        if (response.hasOwnProperty('status')) {
+            const status = response.status;
+            return status === 'behind' || status === 'identical';
+        }
+        return false;
     });
 }
 exports.containsInBranch = containsInBranch;
