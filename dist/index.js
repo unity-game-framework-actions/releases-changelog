@@ -10093,16 +10093,11 @@ function containsInBranch(owner, repo, branch, target) {
             const data = response.data;
             if (data.hasOwnProperty('status')) {
                 const status = data.status;
-                core.debug(`compare/${branch}...${target}, status:${status}`);
                 return status === 'behind' || status === 'identical';
-            }
-            else {
-                core.debug(`compare/${branch}...${target}, status:no, response:${response.status}`);
             }
             return false;
         }
         catch (_a) {
-            core.debug(`compare/${branch}...${target}, error`);
             return false;
         }
     });
@@ -10191,9 +10186,8 @@ function getReleasesByBranch(owner, repo, branch) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield getReleases(owner, repo);
         const result = [];
-        core.debug(`releases: ${releases.length}`);
         for (const release of releases) {
-            if (yield containsInBranch(owner, repo, branch, release.name)) {
+            if (yield containsInBranch(owner, repo, branch, release.tag_name)) {
                 result.push(release);
             }
         }

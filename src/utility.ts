@@ -186,17 +186,11 @@ export async function containsInBranch(owner: string, repo: string, branch: stri
     if (data.hasOwnProperty('status')) {
       const status = data.status
 
-      core.debug(`compare/${branch}...${target}, status:${status}`)
-
       return status === 'behind' || status === 'identical'
-    } else {
-      core.debug(`compare/${branch}...${target}, status:no, response:${response.status}`)
     }
 
     return false
   } catch {
-    core.debug(`compare/${branch}...${target}, error`)
-
     return false
   }
 }
@@ -283,10 +277,8 @@ export async function getReleasesByBranch(owner: string, repo: string, branch: s
   const releases = await getReleases(owner, repo)
   const result = []
 
-  core.debug(`releases: ${releases.length}`)
-
   for (const release of releases) {
-    if (await containsInBranch(owner, repo, branch, release.name)) {
+    if (await containsInBranch(owner, repo, branch, release.tag_name)) {
       result.push(release)
     }
   }
