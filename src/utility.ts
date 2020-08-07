@@ -195,6 +195,8 @@ export async function containsInBranch(owner: string, repo: string, branch: stri
 
     return false
   } catch {
+    core.debug(`compare/${branch}...${target}, error`)
+
     return false
   }
 }
@@ -280,6 +282,8 @@ export async function getReleases(owner: string, repo: string): Promise<any[]> {
 export async function getReleasesByBranch(owner: string, repo: string, branch: string): Promise<any[]> {
   const releases = await getReleases(owner, repo)
   const result = []
+
+  core.debug(`releases: ${releases.length}`)
 
   for (const release of releases) {
     if (await containsInBranch(owner, repo, branch, release.name)) {
