@@ -179,15 +179,20 @@ export function getOctokit(): any {
 
 export async function containsInBranch(owner: string, repo: string, branch: string, target: string): Promise<boolean> {
   const octokit = getOctokit()
-  const response = await octokit.paginate(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`)
 
-  if (response.hasOwnProperty('status')) {
-    const status = response.status
+  try {
+    const response = await octokit.paginate(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`)
 
-    return status === 'behind' || status === 'identical'
+    if (response.hasOwnProperty('status')) {
+      const status = response.status
+
+      return status === 'behind' || status === 'identical'
+    }
+
+    return false
+  } catch {
+    return false
   }
-
-  return false
 }
 
 export async function getMilestone(owner: string, repo: string, milestoneNumberOrTitle: string): Promise<any> {
