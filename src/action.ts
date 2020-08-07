@@ -58,13 +58,7 @@ async function getReleases(owner: string, repo: string, target: string): Promise
   if (target === 'all') {
     releases = await utility.getReleases(owner, repo)
   } else {
-    const tags = await utility.getBranchTags(target)
-
-    for (const tag of tags) {
-      const release = await utility.getRelease(owner, repo, tag)
-
-      releases.push(release)
-    }
+    releases = await utility.getReleasesByBranch(owner, repo, target)
   }
 
   for (const release of releases) {

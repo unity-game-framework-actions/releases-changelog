@@ -177,6 +177,20 @@ export function getOctokit(): any {
   return github.getOctokit(token)
 }
 
+export async function containsInBranch(owner: string, repo: string, branch: string, target: string): Promise<boolean> {
+  const octokit = getOctokit()
+  const response = await octokit.repos.compareCommits({
+    owner: owner,
+    repo: repo,
+    base: branch,
+    head: target
+  })
+
+  const status = response.data.status
+
+  return status === 'behind' || status === 'identical'
+}
+
 export async function getMilestone(owner: string, repo: string, milestoneNumberOrTitle: string): Promise<any> {
   const octokit = getOctokit()
 
@@ -255,6 +269,19 @@ export async function getReleases(owner: string, repo: string): Promise<any[]> {
   return await octokit.paginate(`GET /repos/${owner}/${repo}/releases`)
 }
 
+export async function getReleasesByBranch(owner: string, repo: string, branch: string): Promise<any[]> {
+  const releases = await getReleases(owner, repo)
+  const result = []
+
+  for (const release of releases) {
+    if (await containsInBranch(owner, repo, branch, release.tag_name)) {
+      result.push(release)
+    }
+  }
+
+  return result
+}
+
 export async function updateRelease(owner: string, repo: string, release: any): Promise<void> {
   const octokit = getOctokit()
 
@@ -269,6 +296,25 @@ export async function updateRelease(owner: string, repo: string, release: any): 
     draft: release.draft,
     prerelease: release.prerelease
   })
+}
+
+export async function getTags(owner: string, repo: string): Promise<any[]> {
+  const octokit = getOctokit()
+
+  return await octokit.paginate(`GET /repos/${owner}/${repo}/tags`)
+}
+
+export async function getTagsByBranch(owner: string, repo: string, branch: string): Promise<any[]> {
+  const tags = await getTags(owner, repo)
+  const result = []
+
+  for (const tag of tags) {
+    if (await containsInBranch(owner, repo, branch, tag.name)) {
+      result.push(tag)
+    }
+  }
+
+  return result
 }
 
 export async function dispatch(owner: string, repo: string, eventType: string, payload: any): Promise<void> {
