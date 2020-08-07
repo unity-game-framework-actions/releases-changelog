@@ -1,7 +1,7 @@
 import * as utility from './utility'
 
-export async function createChangelog(owner: string, repo: string, target: string, config: any): Promise<string> {
-  const releases = await getReleases(owner, repo, target)
+export async function createChangelog(owner: string, repo: string, branch: string, config: any): Promise<string> {
+  const releases = await getReleases(owner, repo, branch)
 
   return formatChangelog(releases, config)
 }
@@ -51,14 +51,14 @@ function formatReleases(releases: any[], config: any): string {
   return format
 }
 
-async function getReleases(owner: string, repo: string, target: string): Promise<any[]> {
+async function getReleases(owner: string, repo: string, branch: string): Promise<any[]> {
   const result = []
   let releases = []
 
-  if (target === 'all') {
+  if (branch === 'all') {
     releases = await utility.getReleases(owner, repo)
   } else {
-    releases = await utility.getReleasesByBranch(owner, repo, target)
+    releases = await utility.getReleasesByBranch(owner, repo, branch)
   }
 
   for (const release of releases) {

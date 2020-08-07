@@ -3760,9 +3760,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createChangelog = void 0;
 const utility = __importStar(__webpack_require__(880));
-function createChangelog(owner, repo, target, config) {
+function createChangelog(owner, repo, branch, config) {
     return __awaiter(this, void 0, void 0, function* () {
-        const releases = yield getReleases(owner, repo, target);
+        const releases = yield getReleases(owner, repo, branch);
         return formatChangelog(releases, config);
     });
 }
@@ -3804,15 +3804,15 @@ function formatReleases(releases, config) {
     }
     return format;
 }
-function getReleases(owner, repo, target) {
+function getReleases(owner, repo, branch) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = [];
         let releases = [];
-        if (target === 'all') {
+        if (branch === 'all') {
             releases = yield utility.getReleases(owner, repo);
         }
         else {
-            releases = yield utility.getReleasesByBranch(owner, repo, target);
+            releases = yield utility.getReleasesByBranch(owner, repo, branch);
         }
         for (const release of releases) {
             if (release.published_at !== '') {
@@ -5076,10 +5076,10 @@ run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const target = core.getInput('target', { required: true });
+            const branch = core.getInput('branch', { required: true });
             const repository = utility.getRepository();
             const config = yield utility.readConfig();
-            const result = yield action.createChangelog(repository.owner, repository.repo, target, config);
+            const result = yield action.createChangelog(repository.owner, repository.repo, branch, config);
             yield utility.setOutput(result);
         }
         catch (error) {
