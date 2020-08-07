@@ -10093,6 +10093,7 @@ function containsInBranch(owner, repo, branch, target) {
             const data = response.data;
             if (data.hasOwnProperty('status')) {
                 const status = data.status;
+                core.debug(`compare/${branch}...${target}, status:${status}`);
                 return status === 'behind' || status === 'identical';
             }
             return false;
