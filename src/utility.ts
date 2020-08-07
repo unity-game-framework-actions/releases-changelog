@@ -181,15 +181,12 @@ export async function containsInBranch(owner: string, repo: string, branch: stri
   const octokit = getOctokit()
 
   try {
-    const response = await octokit.paginate(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`)
+    const response = await octokit.request(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`)
 
     if (response.hasOwnProperty('status')) {
       const status = response.status
-      const contains = status === 'behind' || status === 'identical'
 
-      core.debug(`compare/${branch}...${target}: status:${status}, contains:${contains}`)
-
-      return contains
+      return status === 'behind' || status === 'identical'
     }
 
     return false
@@ -281,9 +278,7 @@ export async function getReleasesByBranch(owner: string, repo: string, branch: s
   const result = []
 
   for (const release of releases) {
-    const contains = await containsInBranch(owner, repo, branch, release.name)
-
-    if (contains) {
+    if (await containsInBranch(owner, repo, branch, release.name)) {
       result.push(release)
     }
   }
@@ -318,9 +313,7 @@ export async function getTagsByBranch(owner: string, repo: string, branch: strin
   const result = []
 
   for (const tag of tags) {
-    const contains = await containsInBranch(owner, repo, branch, tag.name)
-
-    if (contains) {
+    if (await containsInBranch(owner, repo, branch, tag.name)) {
       result.push(tag)
     }
   }

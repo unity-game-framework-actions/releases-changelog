@@ -15099,12 +15099,10 @@ function containsInBranch(owner, repo, branch, target) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = getOctokit();
         try {
-            const response = yield octokit.paginate(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`);
+            const response = yield octokit.request(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`);
             if (response.hasOwnProperty('status')) {
                 const status = response.status;
-                const contains = status === 'behind' || status === 'identical';
-                core.debug(`compare/${branch}...${target}: status:${status}, contains:${contains}`);
-                return contains;
+                return status === 'behind' || status === 'identical';
             }
             return false;
         }
@@ -15198,8 +15196,7 @@ function getReleasesByBranch(owner, repo, branch) {
         const releases = yield getReleases(owner, repo);
         const result = [];
         for (const release of releases) {
-            const contains = yield containsInBranch(owner, repo, branch, release.name);
-            if (contains) {
+            if (yield containsInBranch(owner, repo, branch, release.name)) {
                 result.push(release);
             }
         }
@@ -15236,8 +15233,7 @@ function getTagsByBranch(owner, repo, branch) {
         const tags = yield getTags(owner, repo);
         const result = [];
         for (const tag of tags) {
-            const contains = yield containsInBranch(owner, repo, branch, tag.name);
-            if (contains) {
+            if (yield containsInBranch(owner, repo, branch, tag.name)) {
                 result.push(tag);
             }
         }
