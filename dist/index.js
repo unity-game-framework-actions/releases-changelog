@@ -9111,6 +9111,7 @@ function run() {
         }
         catch (error) {
             core.setFailed(error.message);
+            core.error(error.stack);
         }
     });
 }

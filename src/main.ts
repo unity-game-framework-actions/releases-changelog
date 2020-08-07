@@ -14,5 +14,6 @@ async function run(): Promise<void> {
     await utility.setOutput(result)
   } catch (error) {
     core.setFailed(error.message)
+    core.error(error.stack)
   }
 }
