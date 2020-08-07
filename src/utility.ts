@@ -183,8 +183,6 @@ export async function containsInBranch(owner: string, repo: string, branch: stri
   try {
     const response = await octokit.paginate(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`)
 
-    core.debug(JSON.stringify(response, null, 2))
-
     if (response.hasOwnProperty('status')) {
       const status = response.status
 
@@ -280,7 +278,9 @@ export async function getReleasesByBranch(owner: string, repo: string, branch: s
   const result = []
 
   for (const release of releases) {
-    if (await containsInBranch(owner, repo, branch, release.tag_name)) {
+    const contains = await containsInBranch(owner, repo, branch, release.name)
+
+    if (contains) {
       result.push(release)
     }
   }
@@ -315,7 +315,9 @@ export async function getTagsByBranch(owner: string, repo: string, branch: strin
   const result = []
 
   for (const tag of tags) {
-    if (await containsInBranch(owner, repo, branch, tag.name)) {
+    const contains = await containsInBranch(owner, repo, branch, tag.name)
+
+    if (contains) {
       result.push(tag)
     }
   }

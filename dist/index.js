@@ -15100,7 +15100,6 @@ function containsInBranch(owner, repo, branch, target) {
         const octokit = getOctokit();
         try {
             const response = yield octokit.paginate(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`);
-            core.debug(JSON.stringify(response, null, 2));
             if (response.hasOwnProperty('status')) {
                 const status = response.status;
                 return status === 'behind' || status === 'identical';
@@ -15197,7 +15196,8 @@ function getReleasesByBranch(owner, repo, branch) {
         const releases = yield getReleases(owner, repo);
         const result = [];
         for (const release of releases) {
-            if (yield containsInBranch(owner, repo, branch, release.tag_name)) {
+            const contains = yield containsInBranch(owner, repo, branch, release.name);
+            if (contains) {
                 result.push(release);
             }
         }
@@ -15234,7 +15234,8 @@ function getTagsByBranch(owner, repo, branch) {
         const tags = yield getTags(owner, repo);
         const result = [];
         for (const tag of tags) {
-            if (yield containsInBranch(owner, repo, branch, tag.name)) {
+            const contains = yield containsInBranch(owner, repo, branch, tag.name);
+            if (contains) {
                 result.push(tag);
             }
         }
