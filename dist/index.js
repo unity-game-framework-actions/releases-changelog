@@ -9909,7 +9909,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dispatch = exports.getTagsByBranch = exports.getTags = exports.updateRelease = exports.getReleasesByBranch = exports.getReleases = exports.getRelease = exports.updateContent = exports.getMilestoneIssues = exports.getMilestone = exports.containsInBranch = exports.getOctokit = exports.formatDate = exports.getOwnerAndRepo = exports.getRepository = exports.setValue = exports.getValue = exports.indent = exports.formatValues = exports.normalize = exports.setOutputFile = exports.setOutputAction = exports.setOutputByType = exports.setOutput = exports.parse = exports.format = exports.write = exports.writeData = exports.read = exports.readData = exports.readConfig = exports.merge = void 0;
+exports.dispatch = exports.getTagsByBranch = exports.getTags = exports.updateRelease = exports.getReleasesByBranch = exports.getReleases = exports.getRelease = exports.updateContent = exports.getMilestoneIssues = exports.getMilestone = exports.containsInBranch = exports.getOctokit = exports.formatDate = exports.getOwnerAndRepo = exports.getRepository = exports.setValue = exports.getValue = exports.indent = exports.formatValues = exports.normalize = exports.setOutputFile = exports.setOutputAction = exports.setOutputByType = exports.setOutput = exports.getInput = exports.parse = exports.format = exports.write = exports.writeData = exports.read = exports.readData = exports.readConfig = exports.merge = void 0;
 const core = __importStar(__webpack_require__(840));
 const github = __importStar(__webpack_require__(837));
 const fs_1 = __webpack_require__(747);
@@ -9982,6 +9982,22 @@ function parse(value, type) {
     }
 }
 exports.parse = parse;
+function getInput() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const input = core.getInput('input', { required: true });
+        const inputSource = core.getInput('inputSource', { required: true });
+        const inputType = core.getInput('inputType', { required: true });
+        switch (inputSource) {
+            case 'value':
+                return parse(input, inputType);
+            case 'file':
+                return yield readData(input, inputType);
+            default:
+                throw `Invalid output type: '${inputSource}'.`;
+        }
+    });
+}
+exports.getInput = getInput;
 function setOutput(value) {
     return __awaiter(this, void 0, void 0, function* () {
         const type = core.getInput('outputType', { required: true });
@@ -10107,10 +10123,10 @@ function getMilestone(owner, repo, milestoneNumberOrTitle) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = getOctokit();
         try {
-            const milestones = yield octokit.paginate(`GET /repos/${owner}/${repo}/milestones/${milestoneNumberOrTitle}`);
-            return milestones[0];
+            const response = yield octokit.request(`GET /repos/${owner}/${repo}/milestones/${milestoneNumberOrTitle}`);
+            return response.data;
         }
-        catch (error) {
+        catch (_a) {
             const milestones = yield octokit.paginate(`GET /repos/${owner}/${repo}/milestones?state=all`);
             for (const milestone of milestones) {
                 if (milestone.title === milestoneNumberOrTitle) {
@@ -10160,17 +10176,17 @@ function getRelease(owner, repo, idOrTag) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = getOctokit();
         try {
-            const releases = yield octokit.paginate(`GET /repos/${owner}/${repo}/releases/${idOrTag}`);
-            return releases[0];
+            const response = yield octokit.request(`GET /repos/${owner}/${repo}/releases/${idOrTag}`);
+            return response.data;
         }
-        catch (error) {
-            const releases = yield octokit.paginate(`GET /repos/${owner}/${repo}/releases`);
-            for (const release of releases) {
-                if (release.tag_name === idOrTag) {
-                    return release;
-                }
+        catch (_a) {
+            try {
+                const response = yield octokit.request(`GET /repos/${owner}/${repo}/releases/tags/${idOrTag}`);
+                return response.data;
             }
-            throw `Release by the specified id or tag name not found: '${idOrTag}'.`;
+            catch (_b) {
+                throw `Release by the specified id or tag name not found: '${idOrTag}'.`;
+            }
         }
     });
 }

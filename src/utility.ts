@@ -66,6 +66,21 @@ export function parse(value: string, type: string): any {
   }
 }
 
+export async function getInput(): Promise<any> {
+  const input = core.getInput('input', {required: true})
+  const inputSource = core.getInput('inputSource', {required: true})
+  const inputType = core.getInput('inputType', {required: true})
+
+  switch (inputSource) {
+    case 'value':
+      return parse(input, inputType)
+    case 'file':
+      return await readData(input, inputType)
+    default:
+      throw `Invalid output type: '${inputSource}'.`
+  }
+}
+
 export async function setOutput(value: string) {
   const type = core.getInput('outputType', {required: true})
 
@@ -199,10 +214,10 @@ export async function getMilestone(owner: string, repo: string, milestoneNumberO
   const octokit = getOctokit()
 
   try {
-    const milestones = await octokit.paginate(`GET /repos/${owner}/${repo}/milestones/${milestoneNumberOrTitle}`)
+    const response = await octokit.request(`GET /repos/${owner}/${repo}/milestones/${milestoneNumberOrTitle}`)
 
-    return milestones[0]
-  } catch (error) {
+    return response.data
+  } catch {
     const milestones = await octokit.paginate(`GET /repos/${owner}/${repo}/milestones?state=all`)
 
     for (const milestone of milestones) {
@@ -251,19 +266,17 @@ export async function getRelease(owner: string, repo: string, idOrTag: string): 
   const octokit = getOctokit()
 
   try {
-    const releases = await octokit.paginate(`GET /repos/${owner}/${repo}/releases/${idOrTag}`)
+    const response = await octokit.request(`GET /repos/${owner}/${repo}/releases/${idOrTag}`)
 
-    return releases[0]
-  } catch (error) {
-    const releases = await octokit.paginate(`GET /repos/${owner}/${repo}/releases`)
+    return response.data
+  } catch {
+    try {
+      const response = await octokit.request(`GET /repos/${owner}/${repo}/releases/tags/${idOrTag}`)
 
-    for (const release of releases) {
-      if (release.tag_name === idOrTag) {
-        return release
-      }
+      return response.data
+    } catch {
+      throw `Release by the specified id or tag name not found: '${idOrTag}'.`
     }
-
-    throw `Release by the specified id or tag name not found: '${idOrTag}'.`
   }
 }
 
