@@ -8,7 +8,7 @@ async function run(): Promise<void> {
   try {
     const branch = core.getInput('branch', {required: true})
     const repository = utility.getRepository()
-    const config = await utility.readConfig()
+    const config = await utility.readConfigAny()
     const result = await action.createChangelog(repository.owner, repository.repo, branch, config)
 
     await utility.setOutput(result)
