@@ -17,6 +17,9 @@ inputs:
     description: 'Path to file or config as value with generate settings. (Possible representation types: "Json" or "Yaml".)'
     default: .github/releases-changelog.yml
     required: true
+  input:
+    description: 'Input can be specific value or file path. (Possible representation types: "Json" or "Yaml".)'
+    required: true
   output:
     description: 'Path to output result as file.'
     required: false

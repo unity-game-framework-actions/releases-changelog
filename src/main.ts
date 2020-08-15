@@ -9,7 +9,8 @@ async function run(): Promise<void> {
     const branch = core.getInput('branch', {required: true})
     const repository = utility.getRepository()
     const config = await utility.readConfigAny()
-    const result = await action.createChangelog(repository.owner, repository.repo, branch, config)
+    const input = await utility.getInputAny()
+    const result = await action.createChangelog(repository.owner, repository.repo, branch, config, input)
 
     await utility.setOutput(result)
   } catch (error) {
