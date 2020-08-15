@@ -3763,46 +3763,56 @@ const utility = __importStar(__webpack_require__(880));
 function createChangelog(owner, repo, branch, config, input) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield getReleases(owner, repo, branch, input);
-        return formatChangelog(releases, config);
+        return yield formatChangelog(releases, config);
     });
 }
 exports.createChangelog = createChangelog;
 function formatChangelog(releases, config) {
-    let format = '';
-    if (config.body !== '') {
-        releases.sort((a, b) => b.published_at.localeCompare(a.published_at));
-        const values = {
-            releases: releases,
-            releasesFormatted: formatReleases(releases, config)
-        };
-        format += utility.formatValues(config.body, values);
-        format = utility.normalize(format);
-    }
-    return format;
+    return __awaiter(this, void 0, void 0, function* () {
+        let format = '';
+        if (config.body !== '') {
+            releases.sort((a, b) => b.published_at.localeCompare(a.published_at));
+            const values = {
+                releases: releases,
+                releasesFormatted: yield formatReleases(releases, config)
+            };
+            format += utility.formatValues(config.body, values);
+            format = utility.normalize(format);
+        }
+        return format;
+    });
 }
 function formatReleases(releases, config) {
-    let format = '';
-    for (const release of releases) {
-        const date = utility.formatDate(new Date(release.published_at), config.dateFormat);
-        const values = {
-            releases: releases,
-            release: release,
-            date: date
-        };
-        format += utility.formatValues(config.release, values);
-        if (config.releaseBody) {
-            if (release.body !== '') {
-                format += `\n${release.body.trim()}\n\n`;
+    return __awaiter(this, void 0, void 0, function* () {
+        let format = '';
+        for (const release of releases) {
+            const date = utility.formatDate(new Date(release.published_at), config.dateFormat);
+            const values = {
+                releases: releases,
+                release: release,
+                date: date
+            };
+            format += utility.formatValues(config.release, values);
+            if (config.releaseBody) {
+                if (release.body !== '') {
+                    if (yield utility.exists(release.body)) {
+                        const body = yield utility.read(release.body);
+                        format += `\n${body.trim()}\n\n`;
+                    }
+                    else {
+                        format += `\n${release.body.trim()}\n\n`;
+                    }
+                }
+                else {
+                    format += `\n${config.empty}\n`;
+                }
             }
             else {
-                format += `\n${config.empty}\n`;
+                format += '\n';
             }
         }
-        else {
-            format += '\n';
-        }
-    }
-    return format;
+        return format;
+    });
 }
 function getReleases(owner, repo, branch, input) {
     return __awaiter(this, void 0, void 0, function* () {

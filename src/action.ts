@@ -3,10 +3,10 @@ import * as utility from './utility'
 export async function createChangelog(owner: string, repo: string, branch: string, config: any, input: any): Promise<string> {
   const releases = await getReleases(owner, repo, branch, input)
 
-  return formatChangelog(releases, config)
+  return await formatChangelog(releases, config)
 }
 
-function formatChangelog(releases: any[], config: any): string {
+async function formatChangelog(releases: any[], config: any): Promise<string> {
   let format = ''
 
   if (config.body !== '') {
@@ -14,7 +14,7 @@ function formatChangelog(releases: any[], config: any): string {
 
     const values = {
       releases: releases,
-      releasesFormatted: formatReleases(releases, config)
+      releasesFormatted: await formatReleases(releases, config)
     }
 
     format += utility.formatValues(config.body, values)
@@ -24,7 +24,7 @@ function formatChangelog(releases: any[], config: any): string {
   return format
 }
 
-function formatReleases(releases: any[], config: any): string {
+async function formatReleases(releases: any[], config: any): Promise<string> {
   let format = ''
 
   for (const release of releases) {
@@ -39,7 +39,13 @@ function formatReleases(releases: any[], config: any): string {
 
     if (config.releaseBody) {
       if (release.body !== '') {
-        format += `\n${release.body.trim()}\n\n`
+        if (await utility.exists(release.body)) {
+          const body = await utility.read(release.body)
+
+          format += `\n${body.trim()}\n\n`
+        } else {
+          format += `\n${release.body.trim()}\n\n`
+        }
       } else {
         format += `\n${config.empty}\n`
       }
