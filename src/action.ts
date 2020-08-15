@@ -1,7 +1,10 @@
 import * as utility from './utility'
+import * as core from '@actions/core'
 
 export async function createChangelog(owner: string, repo: string, branch: string, config: any, input: any): Promise<string> {
   const releases = await getReleases(owner, repo, branch, input)
+
+  core.debug(JSON.stringify(releases, null, 2))
 
   return formatChangelog(releases, config)
 }
@@ -53,7 +56,7 @@ function formatReleases(releases: any[], config: any): string {
 
 async function getReleases(owner: string, repo: string, branch: string, input: any): Promise<any[]> {
   const result = []
-  let releases = []
+  const releases = []
 
   if (input.hasOwnProperty('releases')) {
     releases.push(input.releases)

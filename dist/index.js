@@ -3760,9 +3760,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createChangelog = void 0;
 const utility = __importStar(__webpack_require__(880));
+const core = __importStar(__webpack_require__(840));
 function createChangelog(owner, repo, branch, config, input) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield getReleases(owner, repo, branch, input);
+        core.debug(JSON.stringify(releases, null, 2));
         return formatChangelog(releases, config);
     });
 }
@@ -3807,7 +3809,7 @@ function formatReleases(releases, config) {
 function getReleases(owner, repo, branch, input) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = [];
-        let releases = [];
+        const releases = [];
         if (input.hasOwnProperty('releases')) {
             releases.push(input.releases);
         }
