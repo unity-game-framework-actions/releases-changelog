@@ -3808,14 +3808,14 @@ function getReleases(owner, repo, branch, input) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = [];
         let releases = [];
-        if (Array.isArray(input)) {
-            releases.push(input);
+        if (input.hasOwnProperty('releases')) {
+            releases.push(input.releases);
         }
         if (branch === 'all') {
-            releases = yield utility.getReleases(owner, repo);
+            releases.push(yield utility.getReleases(owner, repo));
         }
         else {
-            releases = yield utility.getReleasesByBranch(owner, repo, branch);
+            releases.push(yield utility.getReleasesByBranch(owner, repo, branch));
         }
         for (const release of releases) {
             if (release.published_at !== '') {

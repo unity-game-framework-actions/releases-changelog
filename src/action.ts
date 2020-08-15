@@ -55,14 +55,14 @@ async function getReleases(owner: string, repo: string, branch: string, input: a
   const result = []
   let releases = []
 
-  if (Array.isArray(input)) {
-    releases.push(input)
+  if (input.hasOwnProperty('releases')) {
+    releases.push(input.releases)
   }
 
   if (branch === 'all') {
-    releases = await utility.getReleases(owner, repo)
+    releases.push(await utility.getReleases(owner, repo))
   } else {
-    releases = await utility.getReleasesByBranch(owner, repo, branch)
+    releases.push(await utility.getReleasesByBranch(owner, repo, branch))
   }
 
   for (const release of releases) {
