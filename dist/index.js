@@ -9929,7 +9929,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dispatch = exports.getTagsByBranch = exports.getTags = exports.updateRelease = exports.getReleasesByBranch = exports.getReleases = exports.getRelease = exports.updateContent = exports.getMilestoneIssues = exports.getMilestone = exports.containsInBranch = exports.getOctokit = exports.formatDate = exports.getOwnerAndRepo = exports.getRepository = exports.setValue = exports.getValue = exports.indent = exports.formatValues = exports.normalize = exports.setOutputFile = exports.setOutputAction = exports.setOutputByType = exports.setOutput = exports.getInput = exports.getInputAny = exports.parse = exports.parseAny = exports.format = exports.write = exports.writeData = exports.read = exports.readData = exports.readDataAny = exports.getDataAny = exports.readConfig = exports.readConfigAny = exports.merge = exports.exists = void 0;
+exports.dispatch = exports.getTagsByBranch = exports.getTags = exports.updateRelease = exports.getReleasesByBranch = exports.getReleases = exports.getRelease = exports.updateContent = exports.getMilestoneIssues = exports.getMilestones = exports.getMilestone = exports.getIssue = exports.containsInBranch = exports.getOctokit = exports.formatDate = exports.getOwnerAndRepo = exports.getRepository = exports.setValue = exports.getValue = exports.indent = exports.formatValues = exports.normalize = exports.setOutputFile = exports.setOutputAction = exports.setOutputByType = exports.setOutput = exports.getInput = exports.getInputAny = exports.parse = exports.parseAny = exports.format = exports.write = exports.writeData = exports.read = exports.readData = exports.readDataAny = exports.getDataAny = exports.readConfig = exports.readConfigAny = exports.merge = exports.exists = void 0;
 const core = __importStar(__webpack_require__(840));
 const github = __importStar(__webpack_require__(837));
 const fs_1 = __webpack_require__(747);
@@ -10028,9 +10028,9 @@ exports.write = write;
 function format(value, type) {
     switch (type) {
         case 'json':
-            return JSON.stringify(value, null, 2);
+            return JSON.stringify(value, null, 2).trim();
         case 'yaml':
-            return yaml.dump(value);
+            return yaml.dump(value).trim();
         default:
             throw `Invalid format type: '${type}'.`;
     }
@@ -10218,6 +10218,14 @@ function containsInBranch(owner, repo, branch, target) {
     });
 }
 exports.containsInBranch = containsInBranch;
+function getIssue(owner, repo, number) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const octokit = getOctokit();
+        const response = yield octokit.request(`GET /repos/${owner}/${repo}/issues/${number}`);
+        return response.data;
+    });
+}
+exports.getIssue = getIssue;
 function getMilestone(owner, repo, milestoneNumberOrTitle) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = getOctokit();
@@ -10237,6 +10245,14 @@ function getMilestone(owner, repo, milestoneNumberOrTitle) {
     });
 }
 exports.getMilestone = getMilestone;
+function getMilestones(owner, repo, state) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const octokit = getOctokit();
+        const milestones = yield octokit.paginate(`GET /repos/${owner}/${repo}/milestones?state=${state}`);
+        return milestones;
+    });
+}
+exports.getMilestones = getMilestones;
 function getMilestoneIssues(owner, repo, milestone, state, labels) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = getOctokit();
