@@ -1,6 +1,10 @@
 name: 'Releases Changelog'
 description: 'Creates changelog based on all releases.'
 inputs:
+  branch:
+    description: 'Branch used to get list of releases, possible values "all" or "name of branch".'
+    default: all
+    required: true
   token:
     description: 'GitHub token used by action.'
     default: ${{ github.token }}
@@ -9,25 +13,19 @@ inputs:
     description: 'Owner and repository name. For example, "Codertocat/Hello-World".'
     default: ${{ github.repository }}
     required: true
-  configPath:
-    description: 'Path to config with generate settings.'
+  config:
+    description: 'Path to file or config as value with generate settings. (Possible representation types: "Json" or "Yaml".)'
     default: .github/releases-changelog.yml
     required: true
-  configType:
-    description: 'Type of config representation, possible values "yaml" or "json".'
-    default: yaml
+  input:
+    description: 'Input can be specific value or file path. (Possible representation types: "Json" or "Yaml".)'
     required: true
-  outputType:
-    description: 'Type of result output, possible values "action", "file" or "all".'
-    default: action
-    required: true
-  outputPath:
-    description: 'Path of output file.'
-    default: ${{ github.action }}
-    required: true
+  output:
+    description: 'Path to output result as file.'
+    required: false
 outputs:
   result:
-    description: 'Changelog generation result.'
+    description: 'Action result.'
 runs:
   using: 'node12'
   main: 'dist/index.js'

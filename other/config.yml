@@ -14,7 +14,7 @@ body: |
   
 # Release format.
 # Available values:
-#   releases: Array of release objects. (Save as 'releases' in body.)
+#   releases: Array of release objects. (Same as 'releases' in body.)
 #   release: Release object. (Read about release object: https://docs.github.com/en/rest/reference/repos#get-a-release.)
 #   date: Date object created based on 'dateFormat' settings.
 release: |
@@ -27,7 +27,7 @@ releaseBody: true
 empty: |
    - No release notes.
 
-# Settings used to format publish date of issue.
+# Settings used to format publish date of release.
 # (Read about possible options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat.)
 dateFormat:
   locale: en

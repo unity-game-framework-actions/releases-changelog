@@ -1,13 +1,30 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {promises as fs} from 'fs'
+import * as ofs from 'fs'
 import * as yaml from 'js-yaml'
 import * as eol from 'eol'
 import indentString from 'indent-string'
 import objectPath from 'object-path'
 
+export async function exists(path: string): Promise<boolean> {
+  try {
+    await fs.access(path, ofs.constants.F_OK)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function merge(target: any, source: any): any {
   return Object.assign(target, source)
+}
+
+export async function readConfigAny(): Promise<any> {
+  const value = core.getInput('config')
+  const result = await getDataAny(value)
+
+  return result.data
 }
 
 export async function readConfig(): Promise<any> {
@@ -15,6 +32,31 @@ export async function readConfig(): Promise<any> {
   const type = core.getInput('configType', {required: true})
 
   return await readData(path, type)
+}
+
+export async function getDataAny(value: string): Promise<{type: string; data: any}> {
+  if (await exists(value)) {
+    const data = await readDataAny(value)
+
+    return data
+  } else {
+    const data = parseAny(value)
+
+    return {
+      type: data.type,
+      data: data.result
+    }
+  }
+}
+
+export async function readDataAny(path: string): Promise<{type: string; data: any}> {
+  const value = await read(path)
+  const data = parseAny(value)
+
+  return {
+    type: data.type,
+    data: data.result
+  }
 }
 
 export async function readData(path: string, type: string): Promise<any> {
@@ -43,11 +85,29 @@ export async function write(path: string, value: string): Promise<void> {
 export function format(value: any, type: string): string {
   switch (type) {
     case 'json':
-      return JSON.stringify(value)
+      return JSON.stringify(value, null, 2).trim()
     case 'yaml':
-      return yaml.dump(value)
+      return yaml.dump(value).trim()
     default:
-      throw `Invalid parse type: '${type}'.`
+      throw `Invalid format type: '${type}'.`
+  }
+}
+
+export function parseAny(value: string): {type: string; result: any} {
+  try {
+    return {
+      type: 'json',
+      result: JSON.parse(value)
+    }
+  } catch {
+    try {
+      return {
+        type: 'yaml',
+        result: yaml.load(value)
+      }
+    } catch {
+      throw `Invalid parse value, expected Json or Yaml.`
+    }
   }
 }
 
@@ -66,10 +126,36 @@ export function parse(value: string, type: string): any {
   }
 }
 
-export async function setOutput(value: string) {
-  const type = core.getInput('outputType', {required: true})
+export async function getInputAny(): Promise<any> {
+  const input = core.getInput('input', {required: true})
+  const result = await getDataAny(input)
 
-  await setOutputByType(type, value)
+  return result.data
+}
+
+export async function getInput(): Promise<any> {
+  const input = core.getInput('input', {required: true})
+  const inputSource = core.getInput('inputSource', {required: true})
+  const inputType = core.getInput('inputType', {required: true})
+
+  switch (inputSource) {
+    case 'value':
+      return parse(input, inputType)
+    case 'file':
+      return await readData(input, inputType)
+    default:
+      throw `Invalid output type: '${inputSource}'.`
+  }
+}
+
+export async function setOutput(value: string) {
+  core.setOutput('result', value)
+
+  const output = core.getInput('output')
+
+  if (output !== '') {
+    await write(output, value)
+  }
 }
 
 export async function setOutputByType(type: string, value: string) {
@@ -176,14 +262,40 @@ export function getOctokit(): any {
   return github.getOctokit(token)
 }
 
+export async function containsInBranch(owner: string, repo: string, branch: string, target: string): Promise<boolean> {
+  const octokit = getOctokit()
+
+  try {
+    const response = await octokit.request(`GET /repos/${owner}/${repo}/compare/${branch}...${target}`)
+    const data = response.data
+
+    if (data.hasOwnProperty('status')) {
+      const status = data.status
+
+      return status === 'behind' || status === 'identical'
+    }
+
+    return false
+  } catch {
+    return false
+  }
+}
+
+export async function getIssue(owner: string, repo: string, number: string): Promise<any> {
+  const octokit = getOctokit()
+  const response = await octokit.request(`GET /repos/${owner}/${repo}/issues/${number}`)
+
+  return response.data
+}
+
 export async function getMilestone(owner: string, repo: string, milestoneNumberOrTitle: string): Promise<any> {
   const octokit = getOctokit()
 
   try {
-    const milestones = await octokit.paginate(`GET /repos/${owner}/${repo}/milestones/${milestoneNumberOrTitle}`)
+    const response = await octokit.request(`GET /repos/${owner}/${repo}/milestones/${milestoneNumberOrTitle}`)
 
-    return milestones[0]
-  } catch (error) {
+    return response.data
+  } catch {
     const milestones = await octokit.paginate(`GET /repos/${owner}/${repo}/milestones?state=all`)
 
     for (const milestone of milestones) {
@@ -194,6 +306,13 @@ export async function getMilestone(owner: string, repo: string, milestoneNumberO
 
     throw `Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`
   }
+}
+
+export async function getMilestones(owner: string, repo: string, state: string): Promise<any[]> {
+  const octokit = getOctokit()
+  const milestones = await octokit.paginate(`GET /repos/${owner}/${repo}/milestones?state=${state}`)
+
+  return milestones
 }
 
 export async function getMilestoneIssues(owner: string, repo: string, milestone: number, state: string, labels: string): Promise<any[]> {
@@ -232,19 +351,17 @@ export async function getRelease(owner: string, repo: string, idOrTag: string): 
   const octokit = getOctokit()
 
   try {
-    const releases = await octokit.paginate(`GET /repos/${owner}/${repo}/releases/${idOrTag}`)
+    const response = await octokit.request(`GET /repos/${owner}/${repo}/releases/${idOrTag}`)
 
-    return releases[0]
-  } catch (error) {
-    const releases = await octokit.paginate(`GET /repos/${owner}/${repo}/releases`)
+    return response.data
+  } catch {
+    try {
+      const response = await octokit.request(`GET /repos/${owner}/${repo}/releases/tags/${idOrTag}`)
 
-    for (const release of releases) {
-      if (release.tag_name === idOrTag) {
-        return release
-      }
+      return response.data
+    } catch {
+      throw `Release by the specified id or tag name not found: '${idOrTag}'.`
     }
-
-    throw `Release by the specified id or tag name not found: '${idOrTag}'.`
   }
 }
 
@@ -252,6 +369,19 @@ export async function getReleases(owner: string, repo: string): Promise<any[]> {
   const octokit = getOctokit()
 
   return await octokit.paginate(`GET /repos/${owner}/${repo}/releases`)
+}
+
+export async function getReleasesByBranch(owner: string, repo: string, branch: string): Promise<any[]> {
+  const releases = await getReleases(owner, repo)
+  const result = []
+
+  for (const release of releases) {
+    if (await containsInBranch(owner, repo, branch, release.tag_name)) {
+      result.push(release)
+    }
+  }
+
+  return result
 }
 
 export async function updateRelease(owner: string, repo: string, release: any): Promise<void> {
@@ -268,6 +398,25 @@ export async function updateRelease(owner: string, repo: string, release: any): 
     draft: release.draft,
     prerelease: release.prerelease
   })
+}
+
+export async function getTags(owner: string, repo: string): Promise<any[]> {
+  const octokit = getOctokit()
+
+  return await octokit.paginate(`GET /repos/${owner}/${repo}/tags`)
+}
+
+export async function getTagsByBranch(owner: string, repo: string, branch: string): Promise<any[]> {
+  const tags = await getTags(owner, repo)
+  const result = []
+
+  for (const tag of tags) {
+    if (await containsInBranch(owner, repo, branch, tag.name)) {
+      result.push(tag)
+    }
+  }
+
+  return result
 }
 
 export async function dispatch(owner: string, repo: string, eventType: string, payload: any): Promise<void> {
