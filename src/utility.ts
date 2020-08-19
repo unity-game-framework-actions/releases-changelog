@@ -126,6 +126,13 @@ export function parse(value: string, type: string): any {
   }
 }
 
+export async function getContextAny(): Promise<any> {
+  const context = core.getInput('context', {required: true})
+  const result = await getDataAny(context)
+
+  return result.data
+}
+
 export async function getInputAny(): Promise<any> {
   const input = core.getInput('input', {required: true})
   const result = await getDataAny(input)

@@ -3760,21 +3760,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createChangelog = void 0;
 const utility = __importStar(__webpack_require__(880));
-function createChangelog(owner, repo, branch, config, input) {
+function createChangelog(owner, repo, branch, config, input, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield getReleases(owner, repo, branch, input);
-        return yield formatChangelog(releases, config);
+        return yield formatChangelog(releases, config, context);
     });
 }
 exports.createChangelog = createChangelog;
-function formatChangelog(releases, config) {
+function formatChangelog(releases, config, context) {
     return __awaiter(this, void 0, void 0, function* () {
         let format = '';
         if (config.body !== '') {
             releases.sort((a, b) => b.published_at.localeCompare(a.published_at));
             const values = {
+                context: context,
                 releases: releases,
-                releasesFormatted: yield formatReleases(releases, config)
+                releasesFormatted: yield formatReleases(releases, config, context)
             };
             format += utility.formatValues(config.body, values);
             format = utility.normalize(format);
@@ -3782,12 +3783,13 @@ function formatChangelog(releases, config) {
         return format;
     });
 }
-function formatReleases(releases, config) {
+function formatReleases(releases, config, context) {
     return __awaiter(this, void 0, void 0, function* () {
         let format = '';
         for (const release of releases) {
             const date = utility.formatDate(new Date(release.published_at), config.dateFormat);
             const values = {
+                context: context,
                 releases: releases,
                 release: release,
                 date: date
@@ -5099,7 +5101,8 @@ function run() {
             const repository = utility.getRepository();
             const config = yield utility.readConfigAny();
             const input = yield utility.getInputAny();
-            const result = yield action.createChangelog(repository.owner, repository.repo, branch, config, input);
+            const context = yield utility.getContextAny();
+            const result = yield action.createChangelog(repository.owner, repository.repo, branch, config, input, context);
             yield utility.setOutput(result);
         }
         catch (error) {
@@ -9929,7 +9932,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dispatch = exports.getTagsByBranch = exports.getTags = exports.updateRelease = exports.getReleasesByBranch = exports.getReleases = exports.getRelease = exports.updateContent = exports.getMilestoneIssues = exports.getMilestones = exports.getMilestone = exports.getIssue = exports.containsInBranch = exports.getOctokit = exports.formatDate = exports.getOwnerAndRepo = exports.getRepository = exports.setValue = exports.getValue = exports.indent = exports.formatValues = exports.normalize = exports.setOutputFile = exports.setOutputAction = exports.setOutputByType = exports.setOutput = exports.getInput = exports.getInputAny = exports.parse = exports.parseAny = exports.format = exports.write = exports.writeData = exports.read = exports.readData = exports.readDataAny = exports.getDataAny = exports.readConfig = exports.readConfigAny = exports.merge = exports.exists = void 0;
+exports.dispatch = exports.getTagsByBranch = exports.getTags = exports.updateRelease = exports.getReleasesByBranch = exports.getReleases = exports.getRelease = exports.updateContent = exports.getMilestoneIssues = exports.getMilestones = exports.getMilestone = exports.getIssue = exports.containsInBranch = exports.getOctokit = exports.formatDate = exports.getOwnerAndRepo = exports.getRepository = exports.setValue = exports.getValue = exports.indent = exports.formatValues = exports.normalize = exports.setOutputFile = exports.setOutputAction = exports.setOutputByType = exports.setOutput = exports.getInput = exports.getInputAny = exports.getContextAny = exports.parse = exports.parseAny = exports.format = exports.write = exports.writeData = exports.read = exports.readData = exports.readDataAny = exports.getDataAny = exports.readConfig = exports.readConfigAny = exports.merge = exports.exists = void 0;
 const core = __importStar(__webpack_require__(840));
 const github = __importStar(__webpack_require__(837));
 const fs_1 = __webpack_require__(747);
@@ -10070,6 +10073,14 @@ function parse(value, type) {
     }
 }
 exports.parse = parse;
+function getContextAny() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const context = core.getInput('context', { required: true });
+        const result = yield getDataAny(context);
+        return result.data;
+    });
+}
+exports.getContextAny = getContextAny;
 function getInputAny() {
     return __awaiter(this, void 0, void 0, function* () {
         const input = core.getInput('input', { required: true });
