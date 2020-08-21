@@ -1,5 +1,6 @@
 # Body format of changelog.
 # Available values:
+#   context: Context object passed into action as 'context' parameter.
 #   releases: Array of release objects. (Read about release object: https://docs.github.com/en/rest/reference/repos#list-releases.)
 #   releasesFormatted: Formatted releases as text.
 body: |
@@ -14,6 +15,7 @@ body: |
   
 # Release format.
 # Available values:
+#   context: Context object passed into action as 'context' parameter.
 #   releases: Array of release objects. (Same as 'releases' in body.)
 #   release: Release object. (Read about release object: https://docs.github.com/en/rest/reference/repos#get-a-release.)
 #   date: Date object created based on 'dateFormat' settings.

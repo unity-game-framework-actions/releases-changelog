@@ -1,20 +1,21 @@
 import * as utility from './utility'
 
-export async function createChangelog(owner: string, repo: string, branch: string, config: any, input: any): Promise<string> {
+export async function createChangelog(owner: string, repo: string, branch: string, config: any, input: any, context: any): Promise<string> {
   const releases = await getReleases(owner, repo, branch, input)
 
-  return await formatChangelog(releases, config)
+  return await formatChangelog(releases, config, context)
 }
 
-async function formatChangelog(releases: any[], config: any): Promise<string> {
+async function formatChangelog(releases: any[], config: any, context: any): Promise<string> {
   let format = ''
 
   if (config.body !== '') {
     releases.sort((a, b) => b.published_at.localeCompare(a.published_at))
 
     const values = {
+      context: context,
       releases: releases,
-      releasesFormatted: await formatReleases(releases, config)
+      releasesFormatted: await formatReleases(releases, config, context)
     }
 
     format += utility.formatValues(config.body, values)
@@ -24,12 +25,13 @@ async function formatChangelog(releases: any[], config: any): Promise<string> {
   return format
 }
 
-async function formatReleases(releases: any[], config: any): Promise<string> {
+async function formatReleases(releases: any[], config: any, context: any): Promise<string> {
   let format = ''
 
   for (const release of releases) {
     const date = utility.formatDate(new Date(release.published_at), config.dateFormat)
     const values = {
+      context: context,
       releases: releases,
       release: release,
       date: date

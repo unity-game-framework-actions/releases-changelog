@@ -10,7 +10,8 @@ async function run(): Promise<void> {
     const repository = utility.getRepository()
     const config = await utility.readConfigAny()
     const input = await utility.getInputAny()
-    const result = await action.createChangelog(repository.owner, repository.repo, branch, config, input)
+    const context = await utility.getContextAny()
+    const result = await action.createChangelog(repository.owner, repository.repo, branch, config, input, context)
 
     await utility.setOutput(result)
   } catch (error) {
