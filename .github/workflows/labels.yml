@@ -1,15 +1,7 @@
 
 name: Labels
 
-on:
-  push:
-    tags-ignore:
-    - '*'
-    paths:
-    - .github/labels.yml
-
-env:
-  GITHUB_TOKEN: ${{ github.token }}
+on: workflow_dispatch
 
 jobs:
   main:
@@ -20,5 +12,16 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: ${{ github.sha }}
-    - name: Sync
-      uses: micnncim/action-label-syncer@v1
+    - name: Config
+      uses: unity-game-framework-actions/file-access@master
+      id: config
+      with:
+        input: |
+          get:
+            labels:
+              input: .github/config.yml
+              path: labels
+    - name: Update
+      uses: unity-game-framework-actions/labels-update@master
+      with:
+        config: ${{ steps.config.outputs.labels }}
