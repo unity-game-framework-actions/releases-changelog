@@ -165,7 +165,7 @@ labels:
   description: An issue no longer relevant, but can be reopened.
   color: fef2c0
 - name: Bug
-  description: Mentioned in changelog under the Fixed section.
+  description: An issue describes an unexpected problem or unintended behavior.
   color: f9d0c4
 - name: Change
   description: Mentioned in changelog under the Changed section.
@@ -176,6 +176,9 @@ labels:
 - name: Feature
   description: Mentioned in changelog under the Added section.
   color: c2e0c6
+- name: Fix
+  description: Mentioned in changelog under the Fixed section.
+  color: c5def5
 - name: Remove
   description: Mentioned in changelog under the Removed section.
   color: f9d0c4
