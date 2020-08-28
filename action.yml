@@ -23,6 +23,7 @@ inputs:
     required: true
   input:
     description: 'Input can be specific value or file path. (Possible representation types: "Json" or "Yaml".)'
+    default: '{}'
     required: true
   output:
     description: 'Path to output result as file.'
