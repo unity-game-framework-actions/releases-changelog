@@ -1,6 +1,6 @@
 {
   "name": "releases-changelog",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "displayName": "Releases Changelog",
   "description": "Creates changelog based on all releases.",
   "main": "lib/main.js",
